@@ -1,6 +1,9 @@
 const userModel = require('../models/user.model');      
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken')
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 
 function hashPassword(password) {
@@ -17,6 +20,12 @@ async function registerUser(req, res) {
     name,   
     password: hashed    
 });   
+
+const token = jwt.sign({
+    id: user._id
+}, process.env.jwtSecret);
+
+res.cookie('token', token)
 
 
       res.status(201).json({
@@ -41,7 +50,12 @@ async function loginUser(req, res) {
         return res.status(401).json({ message: 'Invalid password' });
     }
 
-     const token = jwt.sign({userID: user._id}, 'secretKey')
+    const token = jwt.sign({
+        id: user._id
+    }, process.env.jwtSecret);
+    
+    res.cookie('token', token)
+
 
 
 
